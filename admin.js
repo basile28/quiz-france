@@ -1,4 +1,19 @@
-﻿const PASSWORD = "2802 BASILE LVD"; // 🔒 Change-le par ton mot de passe secret
+// 🔒 Vérification de l’adresse IP
+const IP_AUTORISEE = "83.202.120.48"; // ← ton IP ici
+
+fetch("https://api.ipify.org?format=json")
+  .then(res => res.json())
+  .then(data => {
+    if (data.ip !== IP_AUTORISEE) {
+      document.body.innerHTML = `
+        <h1 style="color:red;text-align:center;">⛔ Accès refusé</h1>
+        <p style="text-align:center;">Cette page est réservée à l’administrateur.</p>
+      `;
+    }
+  });
+
+// 🔑 Mot de passe admin
+const PASSWORD = "2802 BASILE LVD"; // change-le aussi !
 
 const authSection = document.getElementById("auth-section");
 const adminSection = document.getElementById("admin-section");
