@@ -1,0 +1,28 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Quiz France</title>
+    <link rel="stylesheet" href="style.css">
+    <script defer src="admin.js"></script>
+</head>
+<body class="admin-body">
+    <h1>🛠️ Panneau d'administration</h1>
+
+    <section id="auth-section">
+        <p>Entrer le mot de passe admin :</p>
+        <input type="password" id="admin-password" placeholder="Mot de passe">
+        <button id="btn-login">Se connecter</button>
+        <p id="auth-error" class="error"></p>
+    </section>
+
+    <section id="admin-section" class="hidden">
+        <h2>📊 Statistiques</h2>
+        <div id="stats-container"></div>
+
+        <button id="btn-reset">🧹 Réinitialiser les stats</button>
+        <button onclick="window.location.href='index.html'">↩️ Retour au jeu</button>
+    </section>
+</body>
+</html>
