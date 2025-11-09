@@ -1,47 +1,45 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Quiz France</title>
+    <title>🇫🇷 Quiz France</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="app">
-        <h1>Quiz France</h1>
+    <div class="container">
+        <h1>🇫🇷 Quiz France</h1>
 
-        <!-- Choix de profil -->
-        <div id="profil-section">
-            <label for="profil">Entrez votre profil :</label>
-            <input type="text" id="profil">
-            <button id="btn-profil">Valider</button>
+        <!-- Section Profil -->
+        <div id="profil-section" class="card">
+            <h2>Choisis ton profil</h2>
+            <input type="text" id="profil" placeholder="Entrez votre nom...">
+            <button id="btn-profil" class="btn">Commencer</button>
         </div>
 
         <!-- Menu principal -->
-        <div id="menu-jeux" class="hidden">
-            <button id="btn-admin" class="hidden">🔒 Mode Admin</button>
-            <button id="btn-changer-profil">👤 Changer de profil</button>
-            <button id="btn-departements">🏙️ Jeu des Départements</button>
-            <button id="btn-capitales">🌆 Jeu des Capitales</button>
-            <button id="btn-stats">📊 Voir les statistiques</button>
+        <div id="menu-jeux" class="card hidden">
+            <h2>Choisis un mode de jeu</h2>
+            <button id="btn-departements" class="btn btn-blue">🏙️ Départements</button>
+            <button id="btn-capitales" class="btn btn-green">🌆 Capitales</button>
+            <button id="btn-stats" class="btn btn-orange">📊 Statistiques</button>
         </div>
 
-        <!-- Quiz -->
-        <div id="quiz-section" class="hidden">
+        <!-- Section Quiz -->
+        <div id="quiz-section" class="card hidden">
             <h2 id="question"></h2>
-            <input type="text" id="reponse">
-            <button id="btn-valider">Valider</button>
+            <input type="text" id="reponse" placeholder="Votre réponse...">
+            <div class="actions">
+                <button id="btn-valider" class="btn btn-green">Valider</button>
+                <button id="btn-suivant" class="btn btn-blue">Suivant</button>
+            </div>
             <p id="correction"></p>
-            <button id="btn-suivant">Suivant</button>
-            <button id="btn-retour">Retour au menu</button>
-        </div>
-
-        <!-- Statistiques -->
-        <div id="stats-section" class="hidden">
-            <h2>📊 Statistiques</h2>
-            <pre id="stats-text"></pre>
-            <button id="btn-stats-retour">Retour</button>
+            <button id="btn-retour" class="btn btn-orange">⬅️ Retour au menu</button>
         </div>
     </div>
+
+    <footer>
+        <p>© 2025 Quiz France — Fait avec ❤️ par Basile</p>
+    </footer>
 
     <script src="script.js"></script>
 </body>
