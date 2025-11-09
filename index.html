@@ -1,0 +1,48 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Quiz France</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <h1>Quiz France</h1>
+
+        <!-- Choix de profil -->
+        <div id="profil-section">
+            <label for="profil">Entrez votre profil :</label>
+            <input type="text" id="profil">
+            <button id="btn-profil">Valider</button>
+        </div>
+
+        <!-- Menu principal -->
+        <div id="menu-jeux" class="hidden">
+            <button id="btn-admin" class="hidden">🔒 Mode Admin</button>
+            <button id="btn-changer-profil">👤 Changer de profil</button>
+            <button id="btn-departements">🏙️ Jeu des Départements</button>
+            <button id="btn-capitales">🌆 Jeu des Capitales</button>
+            <button id="btn-stats">📊 Voir les statistiques</button>
+        </div>
+
+        <!-- Quiz -->
+        <div id="quiz-section" class="hidden">
+            <h2 id="question"></h2>
+            <input type="text" id="reponse">
+            <button id="btn-valider">Valider</button>
+            <p id="correction"></p>
+            <button id="btn-suivant">Suivant</button>
+            <button id="btn-retour">Retour au menu</button>
+        </div>
+
+        <!-- Statistiques -->
+        <div id="stats-section" class="hidden">
+            <h2>📊 Statistiques</h2>
+            <pre id="stats-text"></pre>
+            <button id="btn-stats-retour">Retour</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
