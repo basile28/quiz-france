@@ -37,14 +37,9 @@ const paysCapitales = {
     "Russie": "Moscou", "Australie": "Canberra", "Afrique du Sud": "Pretoria"
 };
 
-// ==========================
-// Variables globales
-// ==========================
-
 // --- Variables globales ---
 let profil = "";
-let departementStats = {};
-let capitaleStats = {};
+let stats = {}; // structure = { "nomProfil": { departementStats: {}, capitaleStats: {} } }
 let currentQuestion = null;
 let currentType = null;
 
@@ -59,19 +54,12 @@ const correctionEl = document.getElementById("correction");
 // --- Chargement des stats existantes ---
 window.addEventListener("load", () => {
     const data = JSON.parse(localStorage.getItem("quizStats"));
-    if (data) {
-        departementStats = data.departementStats || {};
-        capitaleStats = data.capitaleStats || {};
-    }
+    if (data) stats = data;
 });
 
 // --- Sauvegarde ---
 function saveStats() {
-    const data = {
-        departementStats,
-        capitaleStats
-    };
-    localStorage.setItem("quizStats", JSON.stringify(data));
+    localStorage.setItem("quizStats", JSON.stringify(stats));
 }
 
 // --- Connexion du profil ---
@@ -79,6 +67,12 @@ document.getElementById("btn-profil").addEventListener("click", () => {
     const input = document.getElementById("profil").value.trim();
     if (input === "") return alert("Entrez un profil !");
     profil = input;
+
+    // Crée un profil vide s’il n’existe pas encore
+    if (!stats[profil]) {
+        stats[profil] = { departementStats: {}, capitaleStats: {} };
+    }
+
     profilSection.classList.add("hidden");
     menuJeux.classList.remove("hidden");
 });
@@ -94,25 +88,27 @@ document.getElementById("btn-retour").addEventListener("click", () => {
 // --- Validation de la réponse ---
 document.getElementById("btn-valider").addEventListener("click", () => {
     const answer = reponseEl.value.trim().toLowerCase();
-    if (!currentQuestion) return;
+    if (!currentQuestion || !profil) return;
 
     let correct = false;
 
     if (currentType === "departement") {
         if (answer === dp[currentQuestion]) correct = true;
-        departementStats[currentQuestion] = departementStats[currentQuestion] || { bonnes: 0, mauvaises: 0 };
-        departementStats[currentQuestion][correct ? "bonnes" : "mauvaises"]++;
+        const s = stats[profil].departementStats;
+        s[currentQuestion] = s[currentQuestion] || { bonnes: 0, mauvaises: 0 };
+        s[currentQuestion][correct ? "bonnes" : "mauvaises"]++;
     } else {
         if (answer === paysCapitales[currentQuestion].toLowerCase()) correct = true;
-        capitaleStats[currentQuestion] = capitaleStats[currentQuestion] || { bonnes: 0, mauvaises: 0 };
-        capitaleStats[currentQuestion][correct ? "bonnes" : "mauvaises"]++;
+        const s = stats[profil].capitaleStats;
+        s[currentQuestion] = s[currentQuestion] || { bonnes: 0, mauvaises: 0 };
+        s[currentQuestion][correct ? "bonnes" : "mauvaises"]++;
     }
 
     correctionEl.textContent = correct
         ? "✅ Bonne réponse !"
         : `❌ Mauvaise réponse. C’était : ${currentType === "departement" ? dp[currentQuestion] : paysCapitales[currentQuestion]}`;
 
-    saveStats(); // ✅ sauvegarde
+    saveStats(); // ✅ Sauvegarde complète
 });
 
 // --- Question suivante ---
