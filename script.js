@@ -31,7 +31,6 @@ const paysCapitales = {
     "Chine":"Pékin","Inde":"New Delhi","Australie":"Canberra","Maroc":"Rabat","Égypte":"Le Caire"
 };
 
-
 // --- Variables ---
 let profil = "";
 let departementStats = {};
@@ -47,13 +46,17 @@ const questionEl = document.getElementById("question");
 const reponseEl = document.getElementById("reponse");
 const correctionEl = document.getElementById("correction");
 
+const statsSection = document.getElementById("stats-section");
+const statsTableBody = document.querySelector("#stats-table tbody");
+const statsTypeSelect = document.getElementById("stats-type");
+const btnStatsRetour = document.getElementById("btn-stats-retour");
+
 // --- Profil ---
 document.getElementById("btn-profil").addEventListener("click", () => {
     const input = document.getElementById("profil").value.trim();
     if(!input) return alert("Entrez un profil !");
     profil = input;
 
-    // Charger stats depuis localStorage
     const saved = localStorage.getItem("stats_" + profil);
     if(saved){
         const stats = JSON.parse(saved);
@@ -75,14 +78,49 @@ document.getElementById("btn-retour").addEventListener("click", () => {
     quizSection.classList.add("hidden");
     menuJeux.classList.remove("hidden");
 });
-document.getElementById("btn-suivant").addEventListener("click", () => startQuiz(currentType));
+document.getElementById("btn-suivant").addEventListener("click", () => {
+    if(!reponseEl.value.trim()) return alert("Veuillez répondre avant de passer à la question suivante !");
+    startQuiz(currentType);
+});
 document.getElementById("btn-valider").addEventListener("click", validerReponse);
+
+// --- Stats ---
 document.getElementById("btn-stats").addEventListener("click", () => {
-    alert("Stats Départements: " + JSON.stringify(departementStats) +
-          "\nStats Capitales: " + JSON.stringify(capitaleStats));
+    menuJeux.classList.add("hidden");
+    statsSection.classList.remove("hidden");
+    afficherStats(statsTypeSelect.value);
 });
 
-// --- Fonctions ---
+statsTypeSelect.addEventListener("change", () => {
+    afficherStats(statsTypeSelect.value);
+});
+
+btnStatsRetour.addEventListener("click", () => {
+    statsSection.classList.add("hidden");
+    menuJeux.classList.remove("hidden");
+});
+
+function afficherStats(type){
+    statsTableBody.innerHTML = "";
+    const stats = (type === "departement") ? departementStats : capitaleStats;
+
+    const noms = Object.keys(stats).sort();
+    if(noms.length === 0){
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td colspan="3">Aucune donnée</td>`;
+        statsTableBody.appendChild(tr);
+        return;
+    }
+
+    noms.forEach(nom => {
+        const s = stats[nom];
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${nom}</td><td>${s.bonnes}</td><td>${s.mauvaises}</td>`;
+        statsTableBody.appendChild(tr);
+    });
+}
+
+// --- Fonctions Quiz ---
 function startQuiz(type){
     currentType = type;
     menuJeux.classList.add("hidden");
@@ -99,11 +137,15 @@ function startQuiz(type){
         currentQuestion = keys[Math.floor(Math.random()*keys.length)];
         questionEl.textContent = `Quelle est la capitale de ${currentQuestion} ?`;
     }
+
+    reponseEl.focus();
 }
 
 function validerReponse(){
     if(!currentQuestion) return;
     const answer = reponseEl.value.trim().toLowerCase();
+    if(!answer) return alert("Veuillez entrer une réponse !");
+
     let correct = false;
 
     if(currentType==="departement"){
@@ -126,3 +168,8 @@ function sauvegarderStats(){
     const stats = {departements: departementStats, capitales: capitaleStats};
     localStorage.setItem("stats_" + profil, JSON.stringify(stats));
 }
+
+// --- Validation avec Enter ---
+reponseEl.addEventListener("keydown", (e) => {
+    if(e.key === "Enter") validerReponse();
+});
