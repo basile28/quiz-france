@@ -38,3 +38,44 @@ button:hover {
     background-color: #007bff;
     color: white;
 }
+
+.admin-body {
+  background: linear-gradient(to bottom right, #222, #555);
+  color: white;
+  text-align: center;
+  font-family: "Poppins", sans-serif;
+}
+
+#stats-table {
+  margin: 20px auto;
+  border-collapse: collapse;
+  width: 90%;
+  max-width: 700px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+#stats-table th, #stats-table td {
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 10px;
+}
+
+#stats-table th {
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+#btn-reset {
+  background-color: crimson;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: all 0.3s;
+}
+
+#btn-reset:hover {
+  background-color: red;
+}
