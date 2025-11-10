@@ -32,11 +32,11 @@ const paysCapitales = {
 };
 
 // --- Variables ---
+let currentQuestion = null;
+let currentType = null;
 let profil = "";
 let departementStats = {};
 let capitaleStats = {};
-let currentQuestion = null;
-let currentType = null;
 
 // --- Sélecteurs ---
 const profilSection = document.getElementById("profil-section");
@@ -46,26 +46,34 @@ const questionEl = document.getElementById("question");
 const reponseEl = document.getElementById("reponse");
 const correctionEl = document.getElementById("correction");
 
-const statsSection = document.getElementById("stats-section");
-const statsCardsContainer = document.getElementById("stats-cards");
-const statsTabs = document.querySelectorAll(".stats-tab");
-const btnStatsRetour = document.getElementById("btn-stats-retour");
+// --- Fonctions Backend ---
+async function chargerStats(profilName) {
+    const res = await fetch("stats.json");
+    const data = await res.json();
+    return data[profilName] || {departements:{}, capitales:{}};
+}
+
+async function sauvegarderStats() {
+    await fetch("save_stats.php", {
+        method:"POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({
+            profil,
+            departements: departementStats,
+            capitales: capitaleStats
+        })
+    });
+}
 
 // --- Profil ---
-document.getElementById("btn-profil").addEventListener("click", () => {
+document.getElementById("btn-profil").addEventListener("click", async () => {
     const input = document.getElementById("profil").value.trim();
     if(!input) return alert("Entrez un profil !");
     profil = input;
 
-    const saved = localStorage.getItem("stats_" + profil);
-    if(saved){
-        const stats = JSON.parse(saved);
-        departementStats = stats.departements || {};
-        capitaleStats = stats.capitales || {};
-    } else {
-        departementStats = {};
-        capitaleStats = {};
-    }
+    const saved = await chargerStats(profil);
+    departementStats = saved.departements;
+    capitaleStats = saved.capitales;
 
     profilSection.classList.add("hidden");
     menuJeux.classList.remove("hidden");
@@ -78,67 +86,23 @@ document.getElementById("btn-retour").addEventListener("click", () => {
     quizSection.classList.add("hidden");
     menuJeux.classList.remove("hidden");
 });
-document.getElementById("btn-suivant").addEventListener("click", () => {
-    if(!reponseEl.value.trim()) return alert("Veuillez répondre avant de passer à la question suivante !");
-    startQuiz(currentType);
-});
+document.getElementById("btn-suivant").addEventListener("click", () => startQuiz(currentType));
 document.getElementById("btn-valider").addEventListener("click", validerReponse);
-
-// --- Stats ---
 document.getElementById("btn-stats").addEventListener("click", () => {
-    menuJeux.classList.add("hidden");
-    statsSection.classList.remove("hidden");
-    afficherStats("departement");
+    let statsText = "Départements:\n";
+    for(const d in departementStats){
+        const s = departementStats[d];
+        statsText += `${d}: ${s.bonnes} ✅ / ${s.mauvaises} ❌\n`;
+    }
+    statsText += "\nCapitales:\n";
+    for(const c in capitaleStats){
+        const s = capitaleStats[c];
+        statsText += `${c}: ${s.bonnes} ✅ / ${s.mauvaises} ❌\n`;
+    }
+    alert(statsText);
 });
 
-// Onglets
-statsTabs.forEach(tab => {
-    tab.addEventListener("click", () => {
-        statsTabs.forEach(t => t.classList.remove("active"));
-        tab.classList.add("active");
-        afficherStats(tab.dataset.type);
-    });
-});
-
-btnStatsRetour.addEventListener("click", () => {
-    statsSection.classList.add("hidden");
-    menuJeux.classList.remove("hidden");
-});
-
-// --- Affichage des stats ---
-function afficherStats(type){
-    statsCardsContainer.innerHTML = "";
-    let allItems = type === "departement" ? {...dp} : {...paysCapitales};
-    const stats = type === "departement" ? departementStats : capitaleStats;
-
-    let items = Object.keys(allItems).map(key => {
-        const nom = allItems[key];
-        const s = stats[nom] || {bonnes:0,mauvaises:0};
-        const total = s.bonnes + s.mauvaises;
-        const ratio = total === 0 ? 0 : s.bonnes/total;
-        return {nom, bonnes:s.bonnes, mauvaises:s.mauvaises, ratio};
-    });
-
-    items.sort((a,b) => a.ratio - b.ratio);
-
-    items.forEach((item, index) => {
-        const pourcentage = item.bonnes + item.mauvaises === 0 ? 0 : Math.round((item.bonnes/(item.bonnes+item.mauvaises))*100);
-        const card = document.createElement("div");
-        card.className = "stats-card";
-        if(index<5 && (item.bonnes+item.mauvaises>0)) card.classList.add("moins-bonne");
-        card.innerHTML = `
-            <h3>${item.nom}</h3>
-            <div class="bar-container">
-                <div class="bar bonnes" style="width:${pourcentage}%;"></div>
-                <div class="bar mauvaises" style="width:${100 - pourcentage}%;"></div>
-            </div>
-            <p>${item.bonnes} ✅ / ${item.mauvaises} ❌</p>
-        `;
-        statsCardsContainer.appendChild(card);
-    });
-}
-
-// --- Fonctions Quiz ---
+// --- Quiz ---
 function startQuiz(type){
     currentType = type;
     menuJeux.classList.add("hidden");
@@ -155,17 +119,14 @@ function startQuiz(type){
         currentQuestion = keys[Math.floor(Math.random()*keys.length)];
         questionEl.textContent = `Quelle est la capitale de ${currentQuestion} ?`;
     }
-
-    reponseEl.focus();
 }
 
-function validerReponse(){
+async function validerReponse(){
     if(!currentQuestion) return;
     const answer = reponseEl.value.trim().toLowerCase();
     if(!answer) return alert("Veuillez entrer une réponse !");
 
     let correct = false;
-
     if(currentType==="departement"){
         const deptName = dp[currentQuestion];
         correct = (answer === deptName.toLowerCase());
@@ -181,14 +142,6 @@ function validerReponse(){
     correctionEl.textContent = correct ? "✅ Bonne réponse !" :
         `❌ Mauvaise réponse. C'était : ${currentType==="departement"?dp[currentQuestion]:paysCapitales[currentQuestion]}`;
 
-    sauvegarderStats();
+    await sauvegarderStats();
 }
 
-function sauvegarderStats(){
-    const stats = {departements: departementStats, capitales: capitaleStats};
-    localStorage.setItem("stats_" + profil, JSON.stringify(stats));
-}
-
-reponseEl.addEventListener("keydown", (e) => {
-    if(e.key === "Enter") validerReponse();
-});
