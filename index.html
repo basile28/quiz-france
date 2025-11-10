@@ -30,6 +30,30 @@
     <button id="btn-retour">Retour au menu</button>
 </div>
 
+<!-- Section Statistiques refondue -->
+<div id="stats-section" class="container hidden">
+    <h2>Mes statistiques</h2>
+
+    <label for="stats-type">Filtrer par type :</label>
+    <select id="stats-type">
+        <option value="departement">Départements</option>
+        <option value="capitale">Capitales</option>
+    </select>
+
+    <table id="stats-table">
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Réussites ✅</th>
+                <th>Échecs ❌</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <button id="btn-stats-retour">Retour au menu</button>
+</div>
+
 <script src="script.js"></script>
 </body>
 </html>
