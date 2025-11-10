@@ -1,75 +1,76 @@
 // 🔒 Vérification de l’adresse IP
 const IP_AUTORISEE = "83.202.120.48"; // ← ton IP ici
 
-// 🔑 Mot de passe admin
-const PASSWORD = "2802 BASILE LVD"; // change-le aussi !
+const listeProfilsEl = document.getElementById("liste-profils");
+const statsProfilEl = document.getElementById("stats-profil");
+const btnReinit = document.getElementById("btn-reinit");
+const btnSupprimer = document.getElementById("btn-supprimer");
+const btnRetour = document.getElementById("btn-retour");
 
-const loginSection = document.getElementById("login-section");
-const adminSection = document.getElementById("admin-section");
-const loginMessage = document.getElementById("login-message");
-const statsBody = document.getElementById("stats-body");
+let profils = [];
+let selectedProfil = null;
 
-// --- Vérification IP ---
-fetch("https://api.ipify.org?format=json")
-  .then(res => res.json())
-  .then(data => {
-    if (data.ip !== IP_AUTORISEE) {
-      document.body.innerHTML = `
-        <h1 style="color:red;text-align:center;margin-top:50px;">
-          ⛔ Accès refusé<br>Votre IP (${data.ip}) n'est pas autorisée
-        </h1>`;
+// Vérifier IP
+fetch('https://api.ipify.org?format=json').then(res=>res.json()).then(data=>{
+    if(data.ip !== ADMIN_IP){
+        alert("Accès admin réservé à l'ordinateur autorisé !");
+        window.location.href = "index.html";
+    } else {
+        chargerProfils();
     }
-  });
-
-// --- Connexion par mot de passe ---
-document.getElementById("btn-login").addEventListener("click", () => {
-  const pass = document.getElementById("admin-password").value.trim();
-  if (pass === PASSWORD) {
-    loginSection.classList.add("hidden");
-    adminSection.classList.remove("hidden");
-    afficherStats();
-  } else {
-    loginMessage.textContent = "❌ Mot de passe incorrect";
-  }
 });
 
-// --- Affichage des statistiques ---
-function afficherStats() {
-  const data = JSON.parse(localStorage.getItem("quizStats"));
-  if (!data) {
-    statsBody.innerHTML = `<tr><td colspan="5">Aucune donnée disponible</td></tr>`;
-    return;
-  }
-
-  statsBody.innerHTML = "";
-  for (const profil in data) {
-    const joueur = data[profil];
-    afficherLigne(profil, "Départements", joueur.departementStats);
-    afficherLigne(profil, "Capitales", joueur.capitaleStats);
-  }
+function chargerProfils(){
+    listeProfilsEl.innerHTML = "";
+    profils = Object.keys(localStorage);
+    profils.forEach(profil => {
+        const li = document.createElement("li");
+        li.textContent = profil;
+        li.style.cursor = "pointer";
+        li.addEventListener("click", () => selectProfil(profil, li));
+        listeProfilsEl.appendChild(li);
+    });
 }
 
-function afficherLigne(profil, type, stats) {
-  const totalBonnes = Object.values(stats).reduce((a, s) => a + (s.bonnes || 0), 0);
-  const totalMauvaises = Object.values(stats).reduce((a, s) => a + (s.mauvaises || 0), 0);
-  const total = totalBonnes + totalMauvaises;
+function selectProfil(profil, li){
+    selectedProfil = profil;
+    Array.from(listeProfilsEl.children).forEach(el => el.style.fontWeight = "normal");
+    li.style.fontWeight = "bold";
 
-  const tr = document.createElement("tr");
-  tr.innerHTML = `
-    <td>${profil}</td>
-    <td>${type}</td>
-    <td>${total}</td>
-    <td>${totalBonnes}</td>
-    <td>${totalMauvaises}</td>
-  `;
-  statsBody.appendChild(tr);
+    const stats = JSON.parse(localStorage.getItem(profil));
+    let texte = `📊 Stats du profil : ${profil}\n\nDépartements:\n`;
+    for(const dep in stats.departementStats){
+        const s = stats.departementStats[dep];
+        texte += `${dep}: ${s.bonnes}✓ / ${s.mauvaises}✗\n`;
+    }
+    texte += `\nCapitales:\n`;
+    for(const cap in stats.capitaleStats){
+        const s = stats.capitaleStats[cap];
+        texte += `${cap}: ${s.bonnes}✓ / ${s.mauvaises}✗\n`;
+    }
+    statsProfilEl.textContent = texte;
 }
 
-// --- Réinitialisation ---
-document.getElementById("btn-reset").addEventListener("click", () => {
-  if (confirm("Voulez-vous vraiment tout réinitialiser ?")) {
-    localStorage.removeItem("quizStats");
-    afficherStats();
-    alert("✅ Statistiques réinitialisées !");
-  }
+// Réinitialiser stats
+btnReinit.addEventListener("click", () => {
+    if(!selectedProfil) return alert("Sélectionnez un profil !");
+    const confirm = window.confirm(`Réinitialiser les stats de ${selectedProfil} ?`);
+    if(confirm){
+        localStorage.setItem(selectedProfil, JSON.stringify({departementStats:{}, capitaleStats:{}}));
+        selectProfil(selectedProfil, Array.from(listeProfilsEl.children).find(el=>el.textContent===selectedProfil));
+    }
 });
+
+// Supprimer profil
+btnSupprimer.addEventListener("click", () => {
+    if(!selectedProfil) return alert("Sélectionnez un profil !");
+    const confirm = window.confirm(`Supprimer le profil ${selectedProfil} ?`);
+    if(confirm){
+        localStorage.removeItem(selectedProfil);
+        selectedProfil = null;
+        statsProfilEl.textContent = "";
+        chargerProfils();
+    }
+});
+
+btnRetour.addEventListener("click", () => window.location.href = "index.html");
