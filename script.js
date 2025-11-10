@@ -41,10 +41,14 @@ const paysCapitales = {
 // Variables globales
 // ==========================
 
+// --- Variables globales ---
 let profil = "";
+let departementStats = {};
+let capitaleStats = {};
 let currentQuestion = null;
 let currentType = null;
 
+// --- Récupération des éléments ---
 const profilSection = document.getElementById("profil-section");
 const menuJeux = document.getElementById("menu-jeux");
 const quizSection = document.getElementById("quiz-section");
@@ -52,10 +56,25 @@ const questionEl = document.getElementById("question");
 const reponseEl = document.getElementById("reponse");
 const correctionEl = document.getElementById("correction");
 
-// ==========================
-// Gestion du profil
-// ==========================
+// --- Chargement des stats existantes ---
+window.addEventListener("load", () => {
+    const data = JSON.parse(localStorage.getItem("quizStats"));
+    if (data) {
+        departementStats = data.departementStats || {};
+        capitaleStats = data.capitaleStats || {};
+    }
+});
 
+// --- Sauvegarde ---
+function saveStats() {
+    const data = {
+        departementStats,
+        capitaleStats
+    };
+    localStorage.setItem("quizStats", JSON.stringify(data));
+}
+
+// --- Connexion du profil ---
 document.getElementById("btn-profil").addEventListener("click", () => {
     const input = document.getElementById("profil").value.trim();
     if (input === "") return alert("Entrez un profil !");
@@ -64,10 +83,7 @@ document.getElementById("btn-profil").addEventListener("click", () => {
     menuJeux.classList.remove("hidden");
 });
 
-// ==========================
-// Boutons de menu
-// ==========================
-
+// --- Navigation ---
 document.getElementById("btn-departements").addEventListener("click", () => startQuiz("departement"));
 document.getElementById("btn-capitales").addEventListener("click", () => startQuiz("capitale"));
 document.getElementById("btn-retour").addEventListener("click", () => {
@@ -75,56 +91,36 @@ document.getElementById("btn-retour").addEventListener("click", () => {
     menuJeux.classList.remove("hidden");
 });
 
-// ==========================
-// Validation des réponses
-// ==========================
-
+// --- Validation de la réponse ---
 document.getElementById("btn-valider").addEventListener("click", () => {
     const answer = reponseEl.value.trim().toLowerCase();
-    let correct = false;
-    let bonneReponse = "";
+    if (!currentQuestion) return;
 
-    if (!currentQuestion || !currentType) {
-        correctionEl.textContent = "⚠️ Erreur : aucune question active.";
-        return;
-    }
+    let correct = false;
 
     if (currentType === "departement") {
-        bonneReponse = dp[currentQuestion]?.toLowerCase();
-        if (!bonneReponse) {
-            correctionEl.textContent = "Erreur interne : département inconnu.";
-            return;
-        }
-        correct = answer === bonneReponse;
-    } else if (currentType === "capitale") {
-        bonneReponse = paysCapitales[currentQuestion]?.toLowerCase();
-        if (!bonneReponse) {
-            correctionEl.textContent = "Erreur interne : pays inconnu.";
-            return;
-        }
-        correct = answer === bonneReponse;
+        if (answer === dp[currentQuestion]) correct = true;
+        departementStats[currentQuestion] = departementStats[currentQuestion] || { bonnes: 0, mauvaises: 0 };
+        departementStats[currentQuestion][correct ? "bonnes" : "mauvaises"]++;
+    } else {
+        if (answer === paysCapitales[currentQuestion].toLowerCase()) correct = true;
+        capitaleStats[currentQuestion] = capitaleStats[currentQuestion] || { bonnes: 0, mauvaises: 0 };
+        capitaleStats[currentQuestion][correct ? "bonnes" : "mauvaises"]++;
     }
 
     correctionEl.textContent = correct
         ? "✅ Bonne réponse !"
-        : `❌ Mauvaise réponse. C’était : ${bonneReponse.charAt(0).toUpperCase() + bonneReponse.slice(1)}`;
+        : `❌ Mauvaise réponse. C’était : ${currentType === "departement" ? dp[currentQuestion] : paysCapitales[currentQuestion]}`;
 
-    // Nettoie le champ de réponse
-    reponseEl.value = "";
+    saveStats(); // ✅ sauvegarde
 });
 
-// ==========================
-// Question suivante
-// ==========================
-
+// --- Question suivante ---
 document.getElementById("btn-suivant").addEventListener("click", () => {
     startQuiz(currentType);
 });
 
-// ==========================
-// Lancer un quiz
-// ==========================
-
+// --- Fonction principale ---
 function startQuiz(type) {
     currentType = type;
     menuJeux.classList.add("hidden");
@@ -136,31 +132,9 @@ function startQuiz(type) {
         const keys = Object.keys(dp);
         currentQuestion = keys[Math.floor(Math.random() * keys.length)];
         questionEl.textContent = `Quel est le nom du département n°${currentQuestion} ?`;
-    } else if (type === "capitale") {
+    } else {
         const keys = Object.keys(paysCapitales);
         currentQuestion = keys[Math.floor(Math.random() * keys.length)];
         questionEl.textContent = `Quelle est la capitale de ${currentQuestion} ?`;
     }
 }
-
-// --- Sauvegarde et chargement des statistiques ---
-
-// Charger les données existantes au démarrage
-window.addEventListener("load", () => {
-    const data = JSON.parse(localStorage.getItem("quizStats"));
-    if (data) {
-        departementStats = data.departementStats || {};
-        capitaleStats = data.capitaleStats || {};
-    }
-});
-
-// Sauvegarder après chaque réponse
-function saveStats() {
-    const data = {
-        departementStats,
-        capitaleStats
-    };
-    localStorage.setItem("quizStats", JSON.stringify(data));
-}
-
-
