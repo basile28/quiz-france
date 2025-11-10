@@ -1,34 +1,49 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quiz France</title>
-<link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz France</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="container" id="profil-section">
-    <h1>Bienvenue au Quiz France</h1>
-    <input type="text" id="profil" placeholder="Entrez votre profil">
-    <button id="btn-profil">Valider Profil</button>
-</div>
+    <div class="container">
 
-<div class="container hidden" id="menu-jeux">
-    <h2>Bonjour, <span id="profil-nom"></span> !</h2>
-    <button id="btn-departements">🏙️ Jeu des Départements</button>
-    <button id="btn-capitales">🌆 Jeu des Capitales</button>
-    <button id="btn-statistiques">📊 Voir mes statistiques</button>
-</div>
+        <!-- Section Profil -->
+        <section id="profil-section">
+            <h1>Bienvenue au Quiz France</h1>
+            <input type="text" id="profil" placeholder="Entrez votre nom de profil">
+            <button id="btn-profil">Valider</button>
+        </section>
 
-<div class="container hidden" id="quiz-section">
-    <h2 id="question"></h2>
-    <input type="text" id="reponse" placeholder="Votre réponse">
-    <div id="correction"></div>
-    <button id="btn-valider">Valider</button>
-    <button id="btn-suivant">Suivant</button>
-    <button id="btn-retour">↩️ Retour au menu</button>
-</div>
+        <!-- Menu Jeux -->
+        <section id="menu-jeux" class="hidden">
+            <h2>Bonjour <span id="nom-profil"></span> !</h2>
+            <button id="btn-departements">🏙️ Quiz Départements</button>
+            <button id="btn-capitales">🌆 Quiz Capitales</button>
+            <button id="btn-stats">📊 Statistiques</button>
+        </section>
 
-<script src="script.js"></script>
+        <!-- Quiz Section -->
+        <section id="quiz-section" class="hidden">
+            <h2 id="question"></h2>
+            <input type="text" id="reponse" placeholder="Votre réponse">
+            <p id="correction"></p>
+            <div class="quiz-buttons">
+                <button id="btn-valider">Valider</button>
+                <button id="btn-suivant">Suivant</button>
+                <button id="btn-retour">Retour au menu</button>
+            </div>
+        </section>
+
+        <!-- Statistiques -->
+        <section id="stats-section" class="hidden">
+            <h2>📊 Vos Statistiques</h2>
+            <pre id="stats-text"></pre>
+            <button id="btn-retour-stats">Retour</button>
+        </section>
+
+    </div>
+    <script src="script.js"></script>
 </body>
 </html>
