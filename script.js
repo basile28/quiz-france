@@ -31,45 +31,87 @@ const paysCapitales = {
     "Chine":"Pékin","Inde":"New Delhi","Australie":"Canberra","Maroc":"Rabat","Égypte":"Le Caire"
 };
 
-// === VARIABLES ===
+
 let profil = "";
 let departementStats = {};
 let capitaleStats = {};
 let currentQuestion = null;
 let currentType = null;
 
-// === ELEMENTS DOM ===
 const profilSection = document.getElementById("profil-section");
 const menuJeux = document.getElementById("menu-jeux");
 const quizSection = document.getElementById("quiz-section");
+const statsSection = document.getElementById("stats-section");
 const questionEl = document.getElementById("question");
 const reponseEl = document.getElementById("reponse");
 const correctionEl = document.getElementById("correction");
-const profilNomEl = document.getElementById("profil-nom");
+const statsText = document.getElementById("stats-text");
+const nomProfilEl = document.getElementById("nom-profil");
 
-// === EVENT LISTENERS ===
+// Valider Profil
 document.getElementById("btn-profil").addEventListener("click", () => {
     const input = document.getElementById("profil").value.trim();
-    if(!input) return alert("Entrez un profil !");
+    if(input === "") return alert("Entrez un profil !");
     profil = input;
-    profilNomEl.textContent = profil;
-    departementStats = JSON.parse(localStorage.getItem(profil))?.departementStats || {};
-    capitaleStats = JSON.parse(localStorage.getItem(profil))?.capitaleStats || {};
+    // Charger stats depuis localStorage
+    const savedStats = localStorage.getItem(profil);
+    if(savedStats){
+        const obj = JSON.parse(savedStats);
+        departementStats = obj.departementStats || {};
+        capitaleStats = obj.capitaleStats || {};
+    } else {
+        departementStats = {};
+        capitaleStats = {};
+    }
+    nomProfilEl.textContent = profil;
     profilSection.classList.add("hidden");
     menuJeux.classList.remove("hidden");
 });
 
+// Boutons Quiz
 document.getElementById("btn-departements").addEventListener("click", () => startQuiz("departement"));
 document.getElementById("btn-capitales").addEventListener("click", () => startQuiz("capitale"));
+
+// Bouton Statistiques
+document.getElementById("btn-stats").addEventListener("click", () => {
+    menuJeux.classList.add("hidden");
+    statsSection.classList.remove("hidden");
+    displayStats();
+});
+document.getElementById("btn-retour-stats").addEventListener("click", () => {
+    statsSection.classList.add("hidden");
+    menuJeux.classList.remove("hidden");
+});
+
+// Quiz
 document.getElementById("btn-retour").addEventListener("click", () => {
     quizSection.classList.add("hidden");
     menuJeux.classList.remove("hidden");
+    saveStats();
 });
-document.getElementById("btn-valider").addEventListener("click", validerReponse);
-document.getElementById("btn-suivant").addEventListener("click", () => startQuiz(currentType));
-document.getElementById("btn-statistiques").addEventListener("click", afficherStats);
 
-// === FONCTIONS ===
+document.getElementById("btn-valider").addEventListener("click", () => {
+    const answer = reponseEl.value.trim().toLowerCase();
+    let correct = false;
+
+    if(currentType === "departement"){
+        if(answer === dp[currentQuestion]) correct = true;
+        departementStats[currentQuestion] = departementStats[currentQuestion] || {bonnes:0, mauvaises:0};
+        departementStats[currentQuestion][correct ? "bonnes" : "mauvaises"]++;
+    } else {
+        if(answer === paysCapitales[currentQuestion].toLowerCase()) correct = true;
+        capitaleStats[currentQuestion] = capitaleStats[currentQuestion] || {bonnes:0, mauvaises:0};
+        capitaleStats[currentQuestion][correct ? "bonnes" : "mauvaises"]++;
+    }
+
+    correctionEl.textContent = correct ? "✅ Bonne réponse !" :
+        `❌ Mauvaise réponse. C’était : ${currentType==="departement"?dp[currentQuestion]:paysCapitales[currentQuestion]}`;
+
+    saveStats();
+});
+
+document.getElementById("btn-suivant").addEventListener("click", () => startQuiz(currentType));
+
 function startQuiz(type){
     currentType = type;
     menuJeux.classList.add("hidden");
@@ -88,38 +130,27 @@ function startQuiz(type){
     }
 }
 
-function validerReponse(){
-    const answer = reponseEl.value.trim().toLowerCase();
-    let correct = false;
-
-    if(currentType === "departement"){
-        if(answer === dp[currentQuestion].toLowerCase()) correct = true;
-        departementStats[currentQuestion] = departementStats[currentQuestion] || {bonnes:0,mauvaises:0};
-        departementStats[currentQuestion][correct?"bonnes":"mauvaises"]++;
-    } else {
-        if(answer === paysCapitales[currentQuestion].toLowerCase()) correct = true;
-        capitaleStats[currentQuestion] = capitaleStats[currentQuestion] || {bonnes:0,mauvaises:0};
-        capitaleStats[currentQuestion][correct?"bonnes":"mauvaises"]++;
+function displayStats(){
+    let texte = "📍 Départements :\n";
+    for(const key in departementStats){
+        const stat = departementStats[key];
+        const total = stat.bonnes + stat.mauvaises;
+        const taux = total ? (stat.bonnes/total*100).toFixed(1) : 0;
+        texte += `${dp[key]} : ${stat.bonnes}✓ / ${stat.mauvaises}✗ (${taux}%)\n`;
     }
-
-    correctionEl.textContent = correct?"✅ Bonne réponse !":
-        `❌ Mauvaise réponse. C'était : ${currentType==="departement"?dp[currentQuestion]:paysCapitales[currentQuestion]}`;
-    
-    // Sauvegarder stats
-    localStorage.setItem(profil, JSON.stringify({departementStats, capitaleStats}));
+    texte += "\n🌆 Capitales :\n";
+    for(const key in capitaleStats){
+        const stat = capitaleStats[key];
+        const total = stat.bonnes + stat.mauvaises;
+        const taux = total ? (stat.bonnes/total*100).toFixed(1) : 0;
+        texte += `${key} : ${stat.bonnes}✓ / ${stat.mauvaises}✗ (${taux}%)\n`;
+    }
+    statsText.textContent = texte;
 }
 
-function afficherStats(){
-    if(!profil) return alert("Choisissez un profil !");
-    let message = `📊 Statistiques du profil : ${profil}\n\nDépartements:\n`;
-    for(const dep in departementStats){
-        const s = departementStats[dep];
-        message += `${dp[dep]}: ${s.bonnes}✓ / ${s.mauvaises}✗\n`;
+function saveStats(){
+    if(profil){
+        const obj = {departementStats, capitaleStats};
+        localStorage.setItem(profil, JSON.stringify(obj));
     }
-    message += `\nCapitales:\n`;
-    for(const cap in capitaleStats){
-        const s = capitaleStats[cap];
-        message += `${cap}: ${s.bonnes}✓ / ${s.mauvaises}✗\n`;
-    }
-    alert(message);
 }
