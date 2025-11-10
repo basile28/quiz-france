@@ -105,31 +105,35 @@ btnStatsRetour.addEventListener("click", () => {
     menuJeux.classList.remove("hidden");
 });
 
-// Affichage visuel des stats
+// --- Affichage des stats complète + top 5 moins bonnes ---
 function afficherStats(type){
     statsCardsContainer.innerHTML = "";
-    const stats = (type === "departement") ? departementStats : capitaleStats;
-    const noms = Object.keys(stats).sort();
+    let allItems = type === "departement" ? {...dp} : {...paysCapitales};
+    const stats = type === "departement" ? departementStats : capitaleStats;
 
-    if(noms.length === 0){
-        statsCardsContainer.innerHTML = `<p>Aucune donnée pour l'instant.</p>`;
-        return;
-    }
-
-    noms.forEach(nom => {
-        const s = stats[nom];
+    let items = Object.keys(allItems).map(key => {
+        const nom = allItems[key];
+        const s = stats[nom] || {bonnes:0,mauvaises:0};
         const total = s.bonnes + s.mauvaises;
-        const pourcentage = total === 0 ? 0 : Math.round((s.bonnes / total) * 100);
+        const ratio = total === 0 ? 0 : s.bonnes/total;
+        return {nom, bonnes:s.bonnes, mauvaises:s.mauvaises, ratio};
+    });
 
+    // Trier par ratio croissant pour mettre les 5 moins bonnes en haut
+    items.sort((a,b) => a.ratio - b.ratio);
+
+    items.forEach((item, index) => {
+        const pourcentage = item.bonnes + item.mauvaises === 0 ? 0 : Math.round((item.bonnes/(item.bonnes+item.mauvaises))*100);
         const card = document.createElement("div");
         card.className = "stats-card";
+        if(index<5 && (item.bonnes+item.mauvaises>0)) card.classList.add("moins-bonne"); // style particulier pour les 5 moins bonnes
         card.innerHTML = `
-            <h3>${nom}</h3>
+            <h3>${item.nom}</h3>
             <div class="bar-container">
                 <div class="bar bonnes" style="width:${pourcentage}%;"></div>
                 <div class="bar mauvaises" style="width:${100 - pourcentage}%;"></div>
             </div>
-            <p>${s.bonnes} ✅ / ${s.mauvaises} ❌</p>
+            <p>${item.bonnes} ✅ / ${item.mauvaises} ❌</p>
         `;
         statsCardsContainer.appendChild(card);
     });
@@ -165,8 +169,8 @@ function validerReponse(){
 
     if(currentType==="departement"){
         correct = (answer === dp[currentQuestion].toLowerCase());
-        if(!departementStats[currentQuestion]) departementStats[currentQuestion]={bonnes:0,mauvaises:0};
-        departementStats[currentQuestion][correct?"bonnes":"mauvaises"]++;
+        if(!departementStats[dp[currentQuestion]]) departementStats[dp[currentQuestion]]={bonnes:0,mauvaises:0};
+        departementStats[dp[currentQuestion]][correct?"bonnes":"mauvaises"]++;
     } else {
         correct = (answer === paysCapitales[currentQuestion].toLowerCase());
         if(!capitaleStats[currentQuestion]) capitaleStats[currentQuestion]={bonnes:0,mauvaises:0};
@@ -184,7 +188,7 @@ function sauvegarderStats(){
     localStorage.setItem("stats_" + profil, JSON.stringify(stats));
 }
 
-// --- Validation avec Enter ---
+// Validation avec Enter
 reponseEl.addEventListener("keydown", (e) => {
     if(e.key === "Enter") validerReponse();
 });
