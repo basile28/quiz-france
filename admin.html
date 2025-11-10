@@ -1,27 +1,18 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Quiz France</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Quiz France</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Mode Admin</h1>
-        <p>Seuls les profils autorisés peuvent accéder à cette page.</p>
-
-        <h2>Profils existants :</h2>
-        <ul id="liste-profils"></ul>
-
-        <h2>Statistiques :</h2>
-        <pre id="stats-profil"></pre>
-
-        <button id="btn-reinit">Réinitialiser le profil sélectionné</button>
-        <button id="btn-supprimer">Supprimer le profil sélectionné</button>
-        <button id="btn-retour">Retour au jeu</button>
-    </div>
-
-    <script src="admin.js"></script>
+<div class="container" id="admin-container">
+    <h1>🔒 Mode Admin</h1>
+    <button id="btn-export">Exporter les stats CSV</button>
+    <button id="btn-reset">Réinitialiser toutes les stats</button>
+    <div id="admin-log"></div>
+</div>
+<script src="admin.js"></script>
 </body>
 </html>
