@@ -1,50 +1,62 @@
-const ADMIN_PASSWORD = "123"; // change le mot de passe
-const ADMIN_IP = ""; // ton IP locale
-
-async function checkAdmin(){
-    const res = await fetch('https://api.ipify.org?format=json');
-    const data = await res.json();
-    if(data.ip !== ADMIN_IP){
-        alert("Accès refusé : IP non autorisée");
-        window.location.href = "index.html";
-        return;
-    }
-    const pwd = prompt("Entrez le mot de passe admin :");
-    if(pwd !== ADMIN_PASSWORD){
-        alert("Mot de passe incorrect !");
-        window.location.href = "index.html";
-        return;
-    }
-    log("Admin connecté ✅");
-}
+const ADMIN_PASSWORD = "123"; // mot de passe
 
 function log(text){
     const logEl = document.getElementById("admin-log");
-    logEl.innerHTML += text+"<br>";
+    if(logEl) logEl.innerHTML += text+"<br>";
 }
 
-checkAdmin();
+document.getElementById("btn-admin-login").addEventListener("click", () => {
+    const pwd = document.getElementById("admin-password").value;
+    if(pwd !== ADMIN_PASSWORD){
+        alert("Mot de passe incorrect !");
+        return;
+    }
+    document.getElementById("admin-login").classList.add("hidden");
+    document.getElementById("admin-panel").classList.remove("hidden");
+    log("Admin connecté ✅");
+    afficherProfils();
+});
 
-document.getElementById("btn-export").addEventListener("click", exportCSV);
+function afficherProfils(){
+    const list = document.getElementById("list-profiles");
+    list.innerHTML = "";
+    for(let i=0;i<localStorage.length;i++){
+        const key = localStorage.key(i);
+        if(key.startsWith("stats_")){
+            const li = document.createElement("li");
+            li.textContent = key.replace("stats_","");
+            list.appendChild(li);
+        }
+    }
+}
+
 document.getElementById("btn-reset").addEventListener("click", () => {
     if(confirm("Réinitialiser toutes les stats ?")){
-        localStorage.clear();
+        for(let i=0;i<localStorage.length;i++){
+            const key = localStorage.key(i);
+            if(key.startsWith("stats_")) localStorage.removeItem(key);
+        }
         alert("Toutes les stats ont été réinitialisées !");
         log("Toutes les stats réinitialisées");
+        afficherProfils();
     }
 });
+
+document.getElementById("btn-export").addEventListener("click", exportCSV);
 
 function exportCSV(){
     let csv = "Profil,Type,Nom,Bonnes,Mauvaises\n";
     for(let i=0;i<localStorage.length;i++){
-        const profil = localStorage.key(i);
-        const stats = JSON.parse(localStorage.getItem(profil));
-        for(const dep in stats.departementStats){
-            const s = stats.departementStats[dep];
+        const profilKey = localStorage.key(i);
+        if(!profilKey.startsWith("stats_")) continue;
+        const profil = profilKey.replace("stats_","");
+        const stats = JSON.parse(localStorage.getItem(profilKey));
+        for(const dep in stats.departements){
+            const s = stats.departements[dep];
             csv += `${profil},departement,${dep},${s.bonnes},${s.mauvaises}\n`;
         }
-        for(const cap in stats.capitaleStats){
-            const s = stats.capitaleStats[cap];
+        for(const cap in stats.capitales){
+            const s = stats.capitales[cap];
             csv += `${profil},capitale,${cap},${s.bonnes},${s.mauvaises}\n`;
         }
     }
@@ -57,4 +69,3 @@ function exportCSV(){
     URL.revokeObjectURL(url);
     log("Stats exportées en CSV ✅");
 }
-
