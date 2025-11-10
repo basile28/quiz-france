@@ -2,32 +2,33 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiz France</title>
     <link rel="stylesheet" href="style.css">
-    <script defer src="script.js"></script>
 </head>
 <body>
-
-    <section id="profil-section">
-        <h1>Bienvenue sur le Quiz France 🇫🇷</h1>
-        <input type="text" id="profil" placeholder="Entrez votre profil">
+    <div id="profil-section" class="container">
+        <h1>Bienvenue au Quiz France</h1>
+        <input type="text" id="profil" placeholder="Entrez votre nom de profil">
         <button id="btn-profil">Valider</button>
-    </section>
+    </div>
 
-    <section id="menu-jeux" class="hidden">
-        <h2>Menu Principal</h2>
-        <button id="btn-departements">Quiz Départements</button>
-        <button id="btn-capitales">Quiz Capitales</button>
-    </section>
+    <div id="menu-jeux" class="container hidden">
+        <h2>Bonjour, <span id="nom-profil"></span></h2>
+        <button id="btn-departements">🏙️ Jeu des départements</button>
+        <button id="btn-capitales">🌆 Jeu des capitales</button>
+        <button id="btn-admin">🔒 Mode Admin</button>
+    </div>
 
-    <section id="quiz-section" class="hidden">
+    <div id="quiz-section" class="container hidden">
         <h2 id="question"></h2>
         <input type="text" id="reponse" placeholder="Votre réponse">
-        <button id="btn-valider">Valider</button>
         <p id="correction"></p>
-        <button id="btn-suivant">Question suivante</button>
+        <button id="btn-valider">Valider</button>
+        <button id="btn-suivant">Suivant</button>
         <button id="btn-retour">Retour au menu</button>
-    </section>
+    </div>
 
+    <script src="script.js"></script>
 </body>
 </html>
