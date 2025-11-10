@@ -55,3 +55,30 @@ pre {
     max-height: 400px;
     overflow-y: auto;
 }
+#stats-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+#stats-table th, #stats-table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: center;
+}
+
+#stats-table th {
+    background: #0078D7;
+    color: white;
+}
+
+#stats-table td {
+    background: #f9f9f9;
+}
+
+#stats-type {
+    padding: 5px;
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
