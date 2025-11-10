@@ -122,3 +122,45 @@ button:hover {
     border-radius: 10px;
     overflow: hidden;
     margin: 
+
+
+/* --- Admin cards modernes --- */
+.admin-profile-card {
+    background: #f9f9f9;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.admin-profile-card h3 {
+    margin: 0 0 10px 0;
+}
+
+.admin-profile-card p {
+    margin: 5px 0;
+}
+
+.admin-profile-card button {
+    width: 48%;
+    display: inline-block;
+    margin-top: 10px;
+}
+
+.admin-profile-card .btn-suppr {
+    background: #dc3545;
+}
+
+.admin-profile-card .btn-suppr:hover {
+    background: #a71d2a;
+}
+
+.admin-profile-card .btn-reset {
+    background: #ffc107;
+    color: #000;
+}
+
+.admin-profile-card .btn-reset:hover {
+    background: #e0a800;
+}
+
