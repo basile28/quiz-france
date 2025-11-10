@@ -1,4 +1,104 @@
-/* Style cartes stats */
+/* --- Global --- */
+body {
+    font-family: Arial, sans-serif;
+    background: #f0f2f5;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 700px;
+    margin-bottom: 20px;
+}
+
+.hidden { display: none; }
+
+input, button {
+    display: block;
+    width: 100%;
+    margin: 10px 0;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+button {
+    background: #0078D7;
+    color: white;
+    cursor: pointer;
+    border: none;
+    transition: background 0.3s;
+}
+
+button:hover {
+    background: #005fa3;
+}
+
+/* --- Quiz --- */
+#quiz-section #question {
+    margin-bottom: 10px;
+}
+
+#correction {
+    margin: 10px 0;
+    font-weight: bold;
+}
+
+/* --- Admin --- */
+#list-profiles {
+    margin: 10px 0;
+    padding-left: 20px;
+}
+
+#admin-log {
+    margin-top: 20px;
+    background: #eee;
+    padding: 10px;
+    border-radius: 5px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+/* --- Stats visuelles --- */
+.stats-tabs {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.stats-tab {
+    padding: 10px 20px;
+    margin: 0 5px;
+    cursor: pointer;
+    border: none;
+    background: #eee;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background 0.3s;
+}
+
+.stats-tab.active {
+    background: #0078D7;
+    color: white;
+}
+
+.stats-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+}
+
 .stats-card {
     background: #f9f9f9;
     border-radius: 10px;
@@ -10,6 +110,10 @@
 
 .stats-card:hover {
     transform: translateY(-3px);
+}
+
+.stats-card h3 {
+    margin: 5px 0;
 }
 
 .bar-container {
@@ -33,7 +137,7 @@
     background: #dc3545;
 }
 
-/* Style 5 moins bonnes performances */
+/* --- 5 moins bonnes performances --- */
 .stats-card.moins-bonne {
     border: 2px solid #dc3545;
 }
