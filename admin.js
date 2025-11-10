@@ -1,5 +1,5 @@
 const ADMIN_PASSWORD = "123"; // change le mot de passe
-const ADMIN_IP = "xxx.xxx.xxx.xxx"; // ton IP locale
+const ADMIN_IP = ""; // ton IP locale
 
 async function checkAdmin(){
     const res = await fetch('https://api.ipify.org?format=json');
@@ -57,3 +57,4 @@ function exportCSV(){
     URL.revokeObjectURL(url);
     log("Stats exportées en CSV ✅");
 }
+
