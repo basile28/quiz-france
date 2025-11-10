@@ -1,76 +1,59 @@
-// 🔒 Vérification de l’adresse IP
-const IP_AUTORISEE = "83.202.120.48"; // ← ton IP ici
+const ADMIN_PASSWORD = "123"; // change le mot de passe
+const ADMIN_IP = "xxx.xxx.xxx.xxx"; // ton IP locale
 
-const listeProfilsEl = document.getElementById("liste-profils");
-const statsProfilEl = document.getElementById("stats-profil");
-const btnReinit = document.getElementById("btn-reinit");
-const btnSupprimer = document.getElementById("btn-supprimer");
-const btnRetour = document.getElementById("btn-retour");
-
-let profils = [];
-let selectedProfil = null;
-
-// Vérifier IP
-fetch('https://api.ipify.org?format=json').then(res=>res.json()).then(data=>{
+async function checkAdmin(){
+    const res = await fetch('https://api.ipify.org?format=json');
+    const data = await res.json();
     if(data.ip !== ADMIN_IP){
-        alert("Accès admin réservé à l'ordinateur autorisé !");
+        alert("Accès refusé : IP non autorisée");
         window.location.href = "index.html";
-    } else {
-        chargerProfils();
+        return;
     }
-});
-
-function chargerProfils(){
-    listeProfilsEl.innerHTML = "";
-    profils = Object.keys(localStorage);
-    profils.forEach(profil => {
-        const li = document.createElement("li");
-        li.textContent = profil;
-        li.style.cursor = "pointer";
-        li.addEventListener("click", () => selectProfil(profil, li));
-        listeProfilsEl.appendChild(li);
-    });
+    const pwd = prompt("Entrez le mot de passe admin :");
+    if(pwd !== ADMIN_PASSWORD){
+        alert("Mot de passe incorrect !");
+        window.location.href = "index.html";
+        return;
+    }
+    log("Admin connecté ✅");
 }
 
-function selectProfil(profil, li){
-    selectedProfil = profil;
-    Array.from(listeProfilsEl.children).forEach(el => el.style.fontWeight = "normal");
-    li.style.fontWeight = "bold";
-
-    const stats = JSON.parse(localStorage.getItem(profil));
-    let texte = `📊 Stats du profil : ${profil}\n\nDépartements:\n`;
-    for(const dep in stats.departementStats){
-        const s = stats.departementStats[dep];
-        texte += `${dep}: ${s.bonnes}✓ / ${s.mauvaises}✗\n`;
-    }
-    texte += `\nCapitales:\n`;
-    for(const cap in stats.capitaleStats){
-        const s = stats.capitaleStats[cap];
-        texte += `${cap}: ${s.bonnes}✓ / ${s.mauvaises}✗\n`;
-    }
-    statsProfilEl.textContent = texte;
+function log(text){
+    const logEl = document.getElementById("admin-log");
+    logEl.innerHTML += text+"<br>";
 }
 
-// Réinitialiser stats
-btnReinit.addEventListener("click", () => {
-    if(!selectedProfil) return alert("Sélectionnez un profil !");
-    const confirm = window.confirm(`Réinitialiser les stats de ${selectedProfil} ?`);
-    if(confirm){
-        localStorage.setItem(selectedProfil, JSON.stringify({departementStats:{}, capitaleStats:{}}));
-        selectProfil(selectedProfil, Array.from(listeProfilsEl.children).find(el=>el.textContent===selectedProfil));
+checkAdmin();
+
+document.getElementById("btn-export").addEventListener("click", exportCSV);
+document.getElementById("btn-reset").addEventListener("click", () => {
+    if(confirm("Réinitialiser toutes les stats ?")){
+        localStorage.clear();
+        alert("Toutes les stats ont été réinitialisées !");
+        log("Toutes les stats réinitialisées");
     }
 });
 
-// Supprimer profil
-btnSupprimer.addEventListener("click", () => {
-    if(!selectedProfil) return alert("Sélectionnez un profil !");
-    const confirm = window.confirm(`Supprimer le profil ${selectedProfil} ?`);
-    if(confirm){
-        localStorage.removeItem(selectedProfil);
-        selectedProfil = null;
-        statsProfilEl.textContent = "";
-        chargerProfils();
+function exportCSV(){
+    let csv = "Profil,Type,Nom,Bonnes,Mauvaises\n";
+    for(let i=0;i<localStorage.length;i++){
+        const profil = localStorage.key(i);
+        const stats = JSON.parse(localStorage.getItem(profil));
+        for(const dep in stats.departementStats){
+            const s = stats.departementStats[dep];
+            csv += `${profil},departement,${dep},${s.bonnes},${s.mauvaises}\n`;
+        }
+        for(const cap in stats.capitaleStats){
+            const s = stats.capitaleStats[cap];
+            csv += `${profil},capitale,${cap},${s.bonnes},${s.mauvaises}\n`;
+        }
     }
-});
-
-btnRetour.addEventListener("click", () => window.location.href = "index.html");
+    const blob = new Blob([csv], {type: "text/csv"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "stats_quiz.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+    log("Stats exportées en CSV ✅");
+}
