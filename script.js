@@ -142,3 +142,25 @@ function startQuiz(type) {
         questionEl.textContent = `Quelle est la capitale de ${currentQuestion} ?`;
     }
 }
+
+// --- Sauvegarde et chargement des statistiques ---
+
+// Charger les données existantes au démarrage
+window.addEventListener("load", () => {
+    const data = JSON.parse(localStorage.getItem("quizStats"));
+    if (data) {
+        departementStats = data.departementStats || {};
+        capitaleStats = data.capitaleStats || {};
+    }
+});
+
+// Sauvegarder après chaque réponse
+function saveStats() {
+    const data = {
+        departementStats,
+        capitaleStats
+    };
+    localStorage.setItem("quizStats", JSON.stringify(data));
+}
+
+
