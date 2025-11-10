@@ -30,26 +30,18 @@
     <button id="btn-retour">Retour au menu</button>
 </div>
 
-<!-- Section Statistiques refondue -->
+<!-- Section Statistiques refondue avec cartes -->
 <div id="stats-section" class="container hidden">
     <h2>Mes statistiques</h2>
 
-    <label for="stats-type">Filtrer par type :</label>
-    <select id="stats-type">
-        <option value="departement">Départements</option>
-        <option value="capitale">Capitales</option>
-    </select>
+    <div class="stats-tabs">
+        <button class="stats-tab active" data-type="departement">Départements</button>
+        <button class="stats-tab" data-type="capitale">Capitales</button>
+    </div>
 
-    <table id="stats-table">
-        <thead>
-            <tr>
-                <th>Nom</th>
-                <th>Réussites ✅</th>
-                <th>Échecs ❌</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
+    <div id="stats-cards" class="stats-cards">
+        <!-- Les cartes des stats seront générées ici -->
+    </div>
 
     <button id="btn-stats-retour">Retour au menu</button>
 </div>
