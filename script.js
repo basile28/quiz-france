@@ -31,12 +31,21 @@ const paysCapitales = {
     "Chine":"Pékin","Inde":"New Delhi","Australie":"Canberra","Maroc":"Rabat","Égypte":"Le Caire"
 };
 
+const paysCapitales = {
+    "France":"Paris","Espagne":"Madrid","Italie":"Rome","Allemagne":"Berlin",
+    "Royaume-Uni":"Londres","Portugal":"Lisbonne","Suisse":"Berne","Belgique":"Bruxelles",
+    "Pays-Bas":"Amsterdam","Grèce":"Athènes","Suède":"Stockholm","Norvège":"Oslo",
+    "Danemark":"Copenhague","Pologne":"Varsovie","Canada":"Ottawa","États-Unis":"Washington D.C.",
+    "Mexique":"Mexico","Brésil":"Brasilia","Argentine":"Buenos Aires","Japon":"Tokyo",
+    "Chine":"Pékin","Inde":"New Delhi","Australie":"Canberra","Maroc":"Rabat","Égypte":"Le Caire"
+};
+
 // --- Variables ---
-let currentQuestion = null;
-let currentType = null;
 let profil = "";
 let departementStats = {};
 let capitaleStats = {};
+let currentQuestion = null;
+let currentType = null;
 
 // --- Sélecteurs ---
 const profilSection = document.getElementById("profil-section");
@@ -46,26 +55,35 @@ const questionEl = document.getElementById("question");
 const reponseEl = document.getElementById("reponse");
 const correctionEl = document.getElementById("correction");
 
-// --- Fonctions Backend ---
+// --- Backend ---
 async function chargerStats(profilName) {
-    const res = await fetch("stats.json");
-    const data = await res.json();
-    return data[profilName] || {departements:{}, capitales:{}};
+    try {
+        const res = await fetch("stats.json");
+        const data = await res.json();
+        return data[profilName] || {departements:{}, capitales:{}};
+    } catch(e) {
+        console.error("Impossible de charger stats :", e);
+        return {departements:{}, capitales:{}};
+    }
 }
 
 async function sauvegarderStats() {
-    await fetch("save_stats.php", {
-        method:"POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({
-            profil,
-            departements: departementStats,
-            capitales: capitaleStats
-        })
-    });
+    try {
+        await fetch("save_stats.php", {
+            method:"POST",
+            headers: {"Content-Type":"application/json"},
+            body: JSON.stringify({
+                profil,
+                departements: departementStats,
+                capitales: capitaleStats
+            })
+        });
+    } catch(e) {
+        console.error("Impossible de sauvegarder stats :", e);
+    }
 }
 
-// --- Profil ---
+// --- Entrée du profil ---
 document.getElementById("btn-profil").addEventListener("click", async () => {
     const input = document.getElementById("profil").value.trim();
     if(!input) return alert("Entrez un profil !");
@@ -144,4 +162,3 @@ async function validerReponse(){
 
     await sauvegarderStats();
 }
-
