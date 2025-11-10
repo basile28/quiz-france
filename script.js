@@ -32,86 +32,57 @@ const paysCapitales = {
 };
 
 
+// --- Variables ---
 let profil = "";
 let departementStats = {};
 let capitaleStats = {};
 let currentQuestion = null;
 let currentType = null;
 
+// --- Sélecteurs ---
 const profilSection = document.getElementById("profil-section");
 const menuJeux = document.getElementById("menu-jeux");
 const quizSection = document.getElementById("quiz-section");
-const statsSection = document.getElementById("stats-section");
 const questionEl = document.getElementById("question");
 const reponseEl = document.getElementById("reponse");
 const correctionEl = document.getElementById("correction");
-const statsText = document.getElementById("stats-text");
-const nomProfilEl = document.getElementById("nom-profil");
 
-// Valider Profil
+// --- Profil ---
 document.getElementById("btn-profil").addEventListener("click", () => {
     const input = document.getElementById("profil").value.trim();
-    if(input === "") return alert("Entrez un profil !");
+    if(!input) return alert("Entrez un profil !");
     profil = input;
+
     // Charger stats depuis localStorage
-    const savedStats = localStorage.getItem(profil);
-    if(savedStats){
-        const obj = JSON.parse(savedStats);
-        departementStats = obj.departementStats || {};
-        capitaleStats = obj.capitaleStats || {};
+    const saved = localStorage.getItem("stats_" + profil);
+    if(saved){
+        const stats = JSON.parse(saved);
+        departementStats = stats.departements || {};
+        capitaleStats = stats.capitales || {};
     } else {
         departementStats = {};
         capitaleStats = {};
     }
-    nomProfilEl.textContent = profil;
+
     profilSection.classList.add("hidden");
     menuJeux.classList.remove("hidden");
 });
 
-// Boutons Quiz
+// --- Menu ---
 document.getElementById("btn-departements").addEventListener("click", () => startQuiz("departement"));
 document.getElementById("btn-capitales").addEventListener("click", () => startQuiz("capitale"));
-
-// Bouton Statistiques
-document.getElementById("btn-stats").addEventListener("click", () => {
-    menuJeux.classList.add("hidden");
-    statsSection.classList.remove("hidden");
-    displayStats();
-});
-document.getElementById("btn-retour-stats").addEventListener("click", () => {
-    statsSection.classList.add("hidden");
-    menuJeux.classList.remove("hidden");
-});
-
-// Quiz
 document.getElementById("btn-retour").addEventListener("click", () => {
     quizSection.classList.add("hidden");
     menuJeux.classList.remove("hidden");
-    saveStats();
 });
-
-document.getElementById("btn-valider").addEventListener("click", () => {
-    const answer = reponseEl.value.trim().toLowerCase();
-    let correct = false;
-
-    if(currentType === "departement"){
-        if(answer === dp[currentQuestion]) correct = true;
-        departementStats[currentQuestion] = departementStats[currentQuestion] || {bonnes:0, mauvaises:0};
-        departementStats[currentQuestion][correct ? "bonnes" : "mauvaises"]++;
-    } else {
-        if(answer === paysCapitales[currentQuestion].toLowerCase()) correct = true;
-        capitaleStats[currentQuestion] = capitaleStats[currentQuestion] || {bonnes:0, mauvaises:0};
-        capitaleStats[currentQuestion][correct ? "bonnes" : "mauvaises"]++;
-    }
-
-    correctionEl.textContent = correct ? "✅ Bonne réponse !" :
-        `❌ Mauvaise réponse. C’était : ${currentType==="departement"?dp[currentQuestion]:paysCapitales[currentQuestion]}`;
-
-    saveStats();
-});
-
 document.getElementById("btn-suivant").addEventListener("click", () => startQuiz(currentType));
+document.getElementById("btn-valider").addEventListener("click", validerReponse);
+document.getElementById("btn-stats").addEventListener("click", () => {
+    alert("Stats Départements: " + JSON.stringify(departementStats) +
+          "\nStats Capitales: " + JSON.stringify(capitaleStats));
+});
 
+// --- Fonctions ---
 function startQuiz(type){
     currentType = type;
     menuJeux.classList.add("hidden");
@@ -130,27 +101,28 @@ function startQuiz(type){
     }
 }
 
-function displayStats(){
-    let texte = "📍 Départements :\n";
-    for(const key in departementStats){
-        const stat = departementStats[key];
-        const total = stat.bonnes + stat.mauvaises;
-        const taux = total ? (stat.bonnes/total*100).toFixed(1) : 0;
-        texte += `${dp[key]} : ${stat.bonnes}✓ / ${stat.mauvaises}✗ (${taux}%)\n`;
+function validerReponse(){
+    if(!currentQuestion) return;
+    const answer = reponseEl.value.trim().toLowerCase();
+    let correct = false;
+
+    if(currentType==="departement"){
+        correct = (answer === dp[currentQuestion].toLowerCase());
+        if(!departementStats[currentQuestion]) departementStats[currentQuestion]={bonnes:0,mauvaises:0};
+        departementStats[currentQuestion][correct?"bonnes":"mauvaises"]++;
+    } else {
+        correct = (answer === paysCapitales[currentQuestion].toLowerCase());
+        if(!capitaleStats[currentQuestion]) capitaleStats[currentQuestion]={bonnes:0,mauvaises:0};
+        capitaleStats[currentQuestion][correct?"bonnes":"mauvaises"]++;
     }
-    texte += "\n🌆 Capitales :\n";
-    for(const key in capitaleStats){
-        const stat = capitaleStats[key];
-        const total = stat.bonnes + stat.mauvaises;
-        const taux = total ? (stat.bonnes/total*100).toFixed(1) : 0;
-        texte += `${key} : ${stat.bonnes}✓ / ${stat.mauvaises}✗ (${taux}%)\n`;
-    }
-    statsText.textContent = texte;
+
+    correctionEl.textContent = correct ? "✅ Bonne réponse !" :
+        `❌ Mauvaise réponse. C'était : ${currentType==="departement"?dp[currentQuestion]:paysCapitales[currentQuestion]}`;
+
+    sauvegarderStats();
 }
 
-function saveStats(){
-    if(profil){
-        const obj = {departementStats, capitaleStats};
-        localStorage.setItem(profil, JSON.stringify(obj));
-    }
+function sauvegarderStats(){
+    const stats = {departements: departementStats, capitales: capitaleStats};
+    localStorage.setItem("stats_" + profil, JSON.stringify(stats));
 }
