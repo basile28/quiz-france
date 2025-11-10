@@ -16,7 +16,7 @@ body {
     border-radius: 10px;
     box-shadow: 0 5px 20px rgba(0,0,0,0.1);
     width: 100%;
-    max-width: 600px;
+    max-width: 700px;
     margin-bottom: 20px;
 }
 
@@ -43,42 +43,64 @@ button:hover {
     background: #005fa3;
 }
 
-.quiz-buttons button {
-    width: 30%;
-    margin-right: 5px;
+/* --- Stats visuelles --- */
+.stats-tabs {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 15px;
 }
 
-pre {
+.stats-tab {
+    padding: 10px 20px;
+    margin: 0 5px;
+    cursor: pointer;
+    border: none;
     background: #eee;
-    padding: 15px;
     border-radius: 5px;
-    max-height: 400px;
-    overflow-y: auto;
-}
-#stats-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
+    font-weight: bold;
+    transition: background 0.3s;
 }
 
-#stats-table th, #stats-table td {
-    border: 1px solid #ccc;
-    padding: 8px;
-    text-align: center;
-}
-
-#stats-table th {
+.stats-tab.active {
     background: #0078D7;
     color: white;
 }
 
-#stats-table td {
+.stats-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+}
+
+.stats-card {
     background: #f9f9f9;
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    text-align: center;
 }
 
-#stats-type {
-    padding: 5px;
-    margin-bottom: 10px;
-    font-size: 16px;
+.stats-card h3 {
+    margin: 5px 0;
 }
 
+.bar-container {
+    display: flex;
+    height: 20px;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 10px 0;
+    background: #ddd;
+}
+
+.bar {
+    height: 100%;
+}
+
+.bar.bonnes {
+    background: #28a745;
+}
+
+.bar.mauvaises {
+    background: #dc3545;
+}
