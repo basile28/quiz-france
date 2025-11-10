@@ -1,36 +1,27 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Administration Quiz France</title>
-  <link rel="stylesheet" href="style.css">
-  <script defer src="admin.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Quiz France</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body class="admin-body">
-  <h1>🔐 Panneau d’administration</h1>
+<body>
+    <div class="container">
+        <h1>Mode Admin</h1>
+        <p>Seuls les profils autorisés peuvent accéder à cette page.</p>
 
-  <section id="login-section">
-    <input type="password" id="admin-password" placeholder="Mot de passe admin">
-    <button id="btn-login">Se connecter</button>
-    <p id="login-message"></p>
-  </section>
+        <h2>Profils existants :</h2>
+        <ul id="liste-profils"></ul>
 
-  <section id="admin-section" class="hidden">
-    <h2>📊 Statistiques des joueurs</h2>
-    <table id="stats-table">
-      <thead>
-        <tr>
-          <th>Profil</th>
-          <th>Type de quiz</th>
-          <th>Questions jouées</th>
-          <th>Bonnes</th>
-          <th>Mauvaises</th>
-        </tr>
-      </thead>
-      <tbody id="stats-body"></tbody>
-    </table>
+        <h2>Statistiques :</h2>
+        <pre id="stats-profil"></pre>
 
-    <button id="btn-reset">🧹 Réinitialiser les statistiques</button>
-  </section>
+        <button id="btn-reinit">Réinitialiser le profil sélectionné</button>
+        <button id="btn-supprimer">Supprimer le profil sélectionné</button>
+        <button id="btn-retour">Retour au jeu</button>
+    </div>
+
+    <script src="admin.js"></script>
 </body>
 </html>
