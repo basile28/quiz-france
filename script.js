@@ -47,8 +47,8 @@ const reponseEl = document.getElementById("reponse");
 const correctionEl = document.getElementById("correction");
 
 const statsSection = document.getElementById("stats-section");
-const statsTableBody = document.querySelector("#stats-table tbody");
-const statsTypeSelect = document.getElementById("stats-type");
+const statsCardsContainer = document.getElementById("stats-cards");
+const statsTabs = document.querySelectorAll(".stats-tab");
 const btnStatsRetour = document.getElementById("btn-stats-retour");
 
 // --- Profil ---
@@ -88,11 +88,16 @@ document.getElementById("btn-valider").addEventListener("click", validerReponse)
 document.getElementById("btn-stats").addEventListener("click", () => {
     menuJeux.classList.add("hidden");
     statsSection.classList.remove("hidden");
-    afficherStats(statsTypeSelect.value);
+    afficherStats("departement");
 });
 
-statsTypeSelect.addEventListener("change", () => {
-    afficherStats(statsTypeSelect.value);
+// Onglets
+statsTabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+        statsTabs.forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+        afficherStats(tab.dataset.type);
+    });
 });
 
 btnStatsRetour.addEventListener("click", () => {
@@ -100,23 +105,33 @@ btnStatsRetour.addEventListener("click", () => {
     menuJeux.classList.remove("hidden");
 });
 
+// Affichage visuel des stats
 function afficherStats(type){
-    statsTableBody.innerHTML = "";
+    statsCardsContainer.innerHTML = "";
     const stats = (type === "departement") ? departementStats : capitaleStats;
-
     const noms = Object.keys(stats).sort();
+
     if(noms.length === 0){
-        const tr = document.createElement("tr");
-        tr.innerHTML = `<td colspan="3">Aucune donnée</td>`;
-        statsTableBody.appendChild(tr);
+        statsCardsContainer.innerHTML = `<p>Aucune donnée pour l'instant.</p>`;
         return;
     }
 
     noms.forEach(nom => {
         const s = stats[nom];
-        const tr = document.createElement("tr");
-        tr.innerHTML = `<td>${nom}</td><td>${s.bonnes}</td><td>${s.mauvaises}</td>`;
-        statsTableBody.appendChild(tr);
+        const total = s.bonnes + s.mauvaises;
+        const pourcentage = total === 0 ? 0 : Math.round((s.bonnes / total) * 100);
+
+        const card = document.createElement("div");
+        card.className = "stats-card";
+        card.innerHTML = `
+            <h3>${nom}</h3>
+            <div class="bar-container">
+                <div class="bar bonnes" style="width:${pourcentage}%;"></div>
+                <div class="bar mauvaises" style="width:${100 - pourcentage}%;"></div>
+            </div>
+            <p>${s.bonnes} ✅ / ${s.mauvaises} ❌</p>
+        `;
+        statsCardsContainer.appendChild(card);
     });
 }
 
