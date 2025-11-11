@@ -32,11 +32,7 @@ const paysCapitales = {
 };
 
 // Variables
-let profil = "";
-let departementStats = {};
-let capitaleStats = {};
-let currentQuestion = null;
-let currentType = null;
+let profil="", departementStats={}, capitaleStats={}, currentQuestion=null, currentType=null;
 
 // Sélecteurs
 const profilSection = document.getElementById("profil-section");
@@ -46,7 +42,7 @@ const questionEl = document.getElementById("question");
 const reponseEl = document.getElementById("reponse");
 const correctionEl = document.getElementById("correction");
 
-// --- Gestion du profil ---
+// Profil
 document.getElementById("btn-profil").addEventListener("click", () => {
     const input = document.getElementById("profil").value.trim();
     if(!input) return alert("Entrez un profil !");
@@ -56,15 +52,12 @@ document.getElementById("btn-profil").addEventListener("click", () => {
         const stats = JSON.parse(saved);
         departementStats = stats.departements || {};
         capitaleStats = stats.capitales || {};
-    } else {
-        departementStats = {};
-        capitaleStats = {};
-    }
+    } else { departementStats = {}; capitaleStats = {}; }
     profilSection.classList.add("hidden");
     menuJeux.classList.remove("hidden");
 });
 
-// --- Menu et boutons ---
+// Menu
 document.getElementById("btn-departements").addEventListener("click", () => startQuiz("departement"));
 document.getElementById("btn-capitales").addEventListener("click", () => startQuiz("capitale"));
 document.getElementById("btn-suivant").addEventListener("click", () => startQuiz(currentType));
@@ -74,75 +67,74 @@ document.getElementById("btn-retour").addEventListener("click", () => {
 });
 document.getElementById("btn-stats").addEventListener("click", showStats);
 document.getElementById("btn-quit").addEventListener("click", () => {
-    if(confirm("Voulez-vous vraiment quitter le site ?")) window.location.href = "https://www.google.com";
+    if(confirm("Voulez-vous vraiment quitter le site ?")) window.location.href="https://www.google.com";
 });
 
-// --- Quiz ---
+// Quiz
+document.getElementById("btn-valider").addEventListener("click", validerReponse);
+reponseEl.addEventListener("keydown", e => { if(e.key==="Enter") validerReponse(); });
+
 function startQuiz(type){
-    currentType = type;
+    currentType=type;
     menuJeux.classList.add("hidden");
     quizSection.classList.remove("hidden");
-    reponseEl.value = "";
-    correctionEl.textContent = "";
+    reponseEl.value="";
+    correctionEl.textContent="";
 
-    if(type === "departement"){
+    if(type==="departement"){
         const keys = Object.keys(dp);
-        currentQuestion = keys[Math.floor(Math.random() * keys.length)];
-        questionEl.textContent = `Quel est le nom du département n°${currentQuestion} ?`;
+        currentQuestion = keys[Math.floor(Math.random()*keys.length)];
+        questionEl.textContent=`Quel est le nom du département n°${currentQuestion} ?`;
     } else {
         const keys = Object.keys(paysCapitales);
-        currentQuestion = keys[Math.floor(Math.random() * keys.length)];
-        questionEl.textContent = `Quelle est la capitale de ${currentQuestion} ?`;
+        currentQuestion = keys[Math.floor(Math.random()*keys.length)];
+        questionEl.textContent=`Quelle est la capitale de ${currentQuestion} ?`;
     }
 }
 
 function validerReponse(){
     if(!currentQuestion) return;
     const answer = reponseEl.value.trim();
-    if(!answer){ alert("Veuillez entrer une réponse !"); return; }
-    let correct = false;
+    if(!answer) { alert("Veuillez entrer une réponse !"); return; }
+    let correct=false;
 
-    if(currentType === "departement"){
-        const deptName = dp[currentQuestion];
-        correct = (answer.toLowerCase() === deptName.toLowerCase());
-        if(!departementStats[deptName]) departementStats[deptName] = {bonnes:0, mauvaises:0};
-        departementStats[deptName][correct ? "bonnes" : "mauvaises"]++;
+    if(currentType==="departement"){
+        const deptName=dp[currentQuestion];
+        correct = (answer.toLowerCase()===deptName.toLowerCase());
+        if(!departementStats[deptName]) departementStats[deptName]={bonnes:0,mauvaises:0};
+        departementStats[deptName][correct?"bonnes":"mauvaises"]++;
     } else {
-        const capName = paysCapitales[currentQuestion];
-        correct = (answer.toLowerCase() === capName.toLowerCase());
-        if(!capitaleStats[capName]) capitaleStats[capName] = {bonnes:0, mauvaises:0};
-        capitaleStats[capName][correct ? "bonnes" : "mauvaises"]++;
+        const capName=paysCapitales[currentQuestion];
+        correct = (answer.toLowerCase()===capName.toLowerCase());
+        if(!capitaleStats[capName]) capitaleStats[capName]={bonnes:0,mauvaises:0};
+        capitaleStats[capName][correct?"bonnes":"mauvaises"]++;
     }
 
-    correctionEl.textContent = correct ? "✅ Bonne réponse !" :
-        `❌ Mauvaise réponse. C'était : ${currentType === "departement" ? dp[currentQuestion] : paysCapitales[currentQuestion]}`;
-
-    reponseEl.value = "";
-    reponseEl.focus();
+    correctionEl.textContent=correct?"✅ Bonne réponse !":
+        `❌ Mauvaise réponse. C'était : ${currentType==="departement"?dp[currentQuestion]:paysCapitales[currentQuestion]}`;
+    reponseEl.value=""; reponseEl.focus();
     sauvegarderStats();
 }
 
 function sauvegarderStats(){
-    const stats = {departements: departementStats, capitales: capitaleStats};
-    localStorage.setItem("stats_" + profil, JSON.stringify(stats));
+    const stats={departements:departementStats,capitales:capitaleStats};
+    localStorage.setItem("stats_"+profil, JSON.stringify(stats));
 }
 
-// --- Statistiques ---
 function showStats(){
     menuJeux.classList.add("hidden");
     quizSection.classList.add("hidden");
-    const statsSection = document.getElementById("stats-section");
+    const statsSection=document.getElementById("stats-section");
     statsSection.classList.remove("hidden");
-    const container = document.getElementById("stats-cards");
-    container.innerHTML = "";
-
-    const types = {departement: departementStats, capitale: capitaleStats};
+    const container=document.getElementById("stats-cards");
+    container.innerHTML="";
+    const types={departement:departementStats,capitale:capitaleStats};
     for(const type in types){
         for(const key in types[type]){
-            const s = types[type][key];
-            const card = document.createElement("div");
-            card.className = "stats-card";
-            card.innerHTML = `<h3>${key} (${type})</h3>
+            const s=types[type][key];
+            const card=document.createElement("div");
+            card.className="stats-card";
+            card.innerHTML=`<h3>${key} (${type})</h3>
                 <div class="bar-container">
                     <div class="bar bonnes" style="width:${s.bonnes*10}px;"></div>
                     <div class="bar mauvaises" style="width:${s.mauvaises*10}px;"></div>
