@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Admin Quiz France</title>
 <link rel="stylesheet" href="style.css">
 </head>
@@ -16,9 +16,13 @@
 
     <section id="admin-panel" class="hidden">
         <h2>⚙️ Gestion des Profils</h2>
-        <ul id="list-profiles"></ul>
-        <button id="btn-reinit">Réinitialiser toutes les stats</button>
-        <button id="btn-export">Exporter en CSV</button>
+
+        <div id="profiles-container"></div>
+
+        <div style="margin-top:20px;">
+            <button id="btn-reinit">Réinitialiser toutes les stats</button>
+            <button id="btn-export">Exporter CSV</button>
+        </div>
     </section>
 </div>
 
