@@ -31,29 +31,22 @@ const paysCapitales = {
     "Chine":"Pékin","Inde":"New Delhi","Australie":"Canberra","Maroc":"Rabat","Égypte":"Le Caire"
 };
 
-const paysCapitales = {
-    "France":"Paris","Espagne":"Madrid","Italie":"Rome","Allemagne":"Berlin",
-    "Royaume-Uni":"Londres","Portugal":"Lisbonne","Suisse":"Berne","Belgique":"Bruxelles",
-    "Pays-Bas":"Amsterdam","Grèce":"Athènes","Suède":"Stockholm","Norvège":"Oslo",
-    "Danemark":"Copenhague","Pologne":"Varsovie","Canada":"Ottawa","États-Unis":"Washington D.C.",
-    "Mexique":"Mexico","Brésil":"Brasilia","Argentine":"Buenos Aires","Japon":"Tokyo",
-    "Chine":"Pékin","Inde":"New Delhi","Australie":"Canberra","Maroc":"Rabat","Égypte":"Le Caire"
-};
-
-// --- Variables ---
+// Variables
 let profil = "";
 let departementStats = {};
 let capitaleStats = {};
 let currentQuestion = null;
 let currentType = null;
 
-// --- Sélecteurs ---
+// Sélecteurs
 const profilSection = document.getElementById("profil-section");
 const menuJeux = document.getElementById("menu-jeux");
 const quizSection = document.getElementById("quiz-section");
 const questionEl = document.getElementById("question");
 const reponseEl = document.getElementById("reponse");
 const correctionEl = document.getElementById("correction");
+const statsSection = document.getElementById("stats-section");
+const statsTableBody = document.querySelector("#stats-table tbody");
 
 // --- Backend ---
 async function chargerStats(profilName) {
@@ -78,12 +71,10 @@ async function sauvegarderStats() {
                 capitales: capitaleStats
             })
         });
-    } catch(e) {
-        console.error("Impossible de sauvegarder stats :", e);
-    }
+    } catch(e) { console.error(e); }
 }
 
-// --- Entrée du profil ---
+// Entrée du profil
 document.getElementById("btn-profil").addEventListener("click", async () => {
     const input = document.getElementById("profil").value.trim();
     if(!input) return alert("Entrez un profil !");
@@ -97,7 +88,7 @@ document.getElementById("btn-profil").addEventListener("click", async () => {
     menuJeux.classList.remove("hidden");
 });
 
-// --- Menu ---
+// Menu
 document.getElementById("btn-departements").addEventListener("click", () => startQuiz("departement"));
 document.getElementById("btn-capitales").addEventListener("click", () => startQuiz("capitale"));
 document.getElementById("btn-retour").addEventListener("click", () => {
@@ -106,21 +97,13 @@ document.getElementById("btn-retour").addEventListener("click", () => {
 });
 document.getElementById("btn-suivant").addEventListener("click", () => startQuiz(currentType));
 document.getElementById("btn-valider").addEventListener("click", validerReponse);
-document.getElementById("btn-stats").addEventListener("click", () => {
-    let statsText = "Départements:\n";
-    for(const d in departementStats){
-        const s = departementStats[d];
-        statsText += `${d}: ${s.bonnes} ✅ / ${s.mauvaises} ❌\n`;
-    }
-    statsText += "\nCapitales:\n";
-    for(const c in capitaleStats){
-        const s = capitaleStats[c];
-        statsText += `${c}: ${s.bonnes} ✅ / ${s.mauvaises} ❌\n`;
-    }
-    alert(statsText);
+document.getElementById("btn-stats").addEventListener("click", afficherStats);
+document.getElementById("btn-stats-retour").addEventListener("click", () => {
+    statsSection.classList.add("hidden");
+    menuJeux.classList.remove("hidden");
 });
 
-// --- Quiz ---
+// Quiz
 function startQuiz(type){
     currentType = type;
     menuJeux.classList.add("hidden");
@@ -128,7 +111,7 @@ function startQuiz(type){
     reponseEl.value = "";
     correctionEl.textContent = "";
 
-    if(type === "departement"){
+    if(type==="departement"){
         const keys = Object.keys(dp);
         currentQuestion = keys[Math.floor(Math.random()*keys.length)];
         questionEl.textContent = `Quel est le nom du département n°${currentQuestion} ?`;
@@ -161,4 +144,28 @@ async function validerReponse(){
         `❌ Mauvaise réponse. C'était : ${currentType==="departement"?dp[currentQuestion]:paysCapitales[currentQuestion]}`;
 
     await sauvegarderStats();
+}
+
+// Affichage stats
+function afficherStats(){
+    statsTableBody.innerHTML = "";
+    // départements
+    const dpEntries = Object.entries(departementStats).map(([k,v])=>({nom:k,...v}));
+    dpEntries.sort((a,b)=>a.bonnes-b.bonnes); // les moins bonnes en haut
+    dpEntries.forEach(e=>{
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${e.nom}</td><td>${e.bonnes}</td><td>${e.mauvaises}</td>`;
+        statsTableBody.appendChild(tr);
+    });
+    // capitales
+    const capEntries = Object.entries(capitaleStats).map(([k,v])=>({nom:k,...v}));
+    capEntries.sort((a,b)=>a.bonnes-b.bonnes);
+    capEntries.forEach(e=>{
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${e.nom}</td><td>${e.bonnes}</td><td>${e.mauvaises}</td>`;
+        statsTableBody.appendChild(tr);
+    });
+
+    menuJeux.classList.add("hidden");
+    statsSection.classList.remove("hidden");
 }
