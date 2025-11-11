@@ -44,6 +44,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const statsSection=document.getElementById("stats-section");
     const statsCards=document.getElementById("stats-cards");
 
+    function normaliserTexte(txt) {
+    return txt
+        .toLowerCase()
+        .normalize("NFD")            // enlève les accents
+        .replace(/[\u0300-\u036f]/g, "") // supprime les diacritiques
+        .replace(/[-'’\s]/g, "")     // supprime tirets, apostrophes, espaces
+        .trim();                     // enlève espaces début/fin
+}
+    
     // --- Profil ---
     document.getElementById("btn-profil").addEventListener("click", () => {
         const input = reponseEl.value.trim() || document.getElementById("profil").value.trim();
