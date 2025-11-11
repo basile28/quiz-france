@@ -8,7 +8,6 @@
 </head>
 <body>
 <div class="container">
-
     <section id="admin-login">
         <h1>Mode Admin</h1>
         <input type="password" id="admin-password" placeholder="Mot de passe admin">
@@ -17,14 +16,12 @@
 
     <section id="admin-panel" class="hidden">
         <h2>⚙️ Gestion des Profils</h2>
-        <div id="profiles-container"></div>
-        <div style="margin-top:20px;">
-            <button id="btn-reinit">Réinitialiser toutes les stats</button>
-            <button id="btn-export">Exporter CSV</button>
-        </div>
+        <ul id="list-profiles"></ul>
+        <button id="btn-reinit">Réinitialiser toutes les stats</button>
+        <button id="btn-export">Exporter en CSV</button>
     </section>
-
 </div>
+
 <script src="admin.js"></script>
 </body>
 </html>
