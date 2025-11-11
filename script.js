@@ -169,3 +169,14 @@ function afficherStats(){
     menuJeux.classList.add("hidden");
     statsSection.classList.remove("hidden");
 }
+
+// === BOUTON QUITTER ===
+document.getElementById("btn-quit").addEventListener("click", () => {
+    if (confirm("Voulez-vous vraiment quitter le site ?")) {
+        // Essaye de fermer l’onglet si possible
+        window.close();
+
+        // Si le navigateur bloque window.close(), redirige vers une page de sortie
+        window.location.href = "https://www.google.fr"; 
+    }
+});
