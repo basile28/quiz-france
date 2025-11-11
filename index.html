@@ -8,30 +8,32 @@
 </head>
 <body>
 
-<div id="profil-section">
+<div id="profil-section" class="card">
     <h2>Entrez votre profil :</h2>
     <input type="text" id="profil" placeholder="Nom du profil">
     <button id="btn-profil">Valider</button>
 </div>
 
-<div id="menu-jeux" class="hidden">
+<div id="menu-jeux" class="hidden card">
     <h2>Menu des jeux</h2>
     <button id="btn-departements">Jeu des Départements</button>
     <button id="btn-capitales">Jeu des Capitales</button>
     <button id="btn-stats">Voir mes statistiques</button>
-    <button id="btn-quit">Quitter le site</button>
+    <button id="btn-quit" class="danger">Quitter le site</button>
 </div>
 
-<div id="quiz-section" class="hidden">
+<div id="quiz-section" class="hidden card">
     <h2 id="question"></h2>
     <input type="text" id="reponse" placeholder="Votre réponse">
     <div id="correction"></div>
-    <button id="btn-valider">Valider</button>
-    <button id="btn-suivant">Suivant</button>
-    <button id="btn-retour">Retour au menu</button>
+    <div class="quiz-buttons">
+        <button id="btn-valider">Valider</button>
+        <button id="btn-suivant">Suivant</button>
+        <button id="btn-retour">Retour au menu</button>
+    </div>
 </div>
 
-<div id="stats-section" class="hidden">
+<div id="stats-section" class="hidden card">
     <h2>Statistiques</h2>
     <div id="stats-cards"></div>
     <button id="btn-stats-retour">Retour</button>
