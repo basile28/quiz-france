@@ -1,49 +1,58 @@
-const ADMIN_PASSWORD = "123";
+const ADMIN_PASSWORD = "123"; // mot de passe admin
+const ADMIN_IP = "xxx.xxx.xxx.xxx"; // ton IP locale
 
-document.getElementById("btn-admin-login").addEventListener("click", () => {
-    const pwd = document.getElementById("admin-password").value;
-    if(pwd !== ADMIN_PASSWORD){ alert("Mot de passe incorrect !"); return; }
+document.getElementById("btn-admin-login").addEventListener("click", loginAdmin);
+document.getElementById("btn-reinit").addEventListener("click", () => {
+    if(confirm("Réinitialiser toutes les stats ?")) {
+        localStorage.clear();
+        alert("Toutes les stats ont été réinitialisées !");
+        loadProfiles();
+    }
+});
+document.getElementById("btn-export").addEventListener("click", exportCSV);
+
+function loginAdmin(){
+    const pwd=document.getElementById("admin-password").value.trim();
+    if(pwd!==ADMIN_PASSWORD) return alert("Mot de passe incorrect !");
     document.getElementById("admin-login").classList.add("hidden");
     document.getElementById("admin-panel").classList.remove("hidden");
-    loadAllStats();
-});
-
-async function loadAllStats() {
-    try {
-        const res = await fetch('load_stats.php');
-        const allStats = await res.json();
-        const container = document.getElementById("profiles-container");
-        container.innerHTML = "";
-        for(const profil in allStats){
-            const stats = allStats[profil];
-            const card = document.createElement("div");
-            card.className = "admin-profile-card";
-            card.innerHTML = `<h3>${profil}</h3>
-                <p>Départements : ${Object.keys(stats.departements||{}).length}</p>
-                <p>Capitales : ${Object.keys(stats.capitales||{}).length}</p>
-                <button class="btn-reset">Réinitialiser</button>
-                <button class="btn-suppr">Supprimer</button>`;
-            container.appendChild(card);
-
-            card.querySelector(".btn-reset").addEventListener("click", () => {
-                if(confirm(`Réinitialiser toutes les stats de ${profil} ?`)){
-                    stats.departements = {}; stats.capitales = {}; saveAllStats(allStats); loadAllStats();
-                }
-            });
-
-            card.querySelector(".btn-suppr").addEventListener("click", () => {
-                if(confirm(`Supprimer le profil ${profil} ?`)){
-                    delete allStats[profil]; saveAllStats(allStats); loadAllStats();
-                }
-            });
-        }
-    } catch(e){ console.error(e); alert("Impossible de charger les stats."); }
+    loadProfiles();
 }
 
-function saveAllStats(data){
-    fetch('save_stats.php', {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({__full_replace:true, data})
-    });
+function loadProfiles(){
+    const ul=document.getElementById("list-profiles");
+    ul.innerHTML="";
+    for(let i=0;i<localStorage.length;i++){
+        const key=localStorage.key(i);
+        if(key.startsWith("stats_")){
+            const li=document.createElement("li");
+            li.textContent=key.replace("stats_","");
+            ul.appendChild(li);
+        }
+    }
+}
+
+function exportCSV(){
+    let csv="Profil,Type,Nom,Bonnes,Mauvaises\n";
+    for(let i=0;i<localStorage.length;i++){
+        const key=localStorage.key(i);
+        if(!key.startsWith("stats_")) continue;
+        const profil=key.replace("stats_","");
+        const stats=JSON.parse(localStorage.getItem(key));
+        for(const dep in stats.departements){
+            const s=stats.departements[dep];
+            csv+=`${profil},departement,${dep},${s.bonnes},${s.mauvaises}\n`;
+        }
+        for(const cap in stats.capitales){
+            const s=stats.capitales[cap];
+            csv+=`${profil},capitale,${cap},${s.bonnes},${s.mauvaises}\n`;
+        }
+    }
+    const blob=new Blob([csv],{type:"text/csv"});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");
+    a.href=url;
+    a.download="stats_quiz.csv";
+    a.click();
+    URL.revokeObjectURL(url);
 }
